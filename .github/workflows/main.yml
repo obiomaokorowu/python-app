@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push Image to Docker Hub
         run: |
-          docker build -t $DOCKERHUB_REPO ./python-app
+          docker build -t $DOCKERHUB_REPO .
           docker push $DOCKERHUB_REPO
 
   deploy-to-ec2:
