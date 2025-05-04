@@ -43,36 +43,35 @@ jobs:
           host: ${{ secrets.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
+          script: |
             echo "Uninstalling any conflicting Docker packages..."
             for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-         	    sudo apt-get remove -y $pkg
+              sudo apt-get remove -y $pkg
             done
-        
+
             echo "Installing Docker via Docker's official method..."
             sudo apt-get update
             sudo apt-get install -y ca-certificates curl
             sudo install -m 0755 -d /etc/apt/keyrings
             sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
             sudo chmod a+r /etc/apt/keyrings/docker.asc
-            
+
             echo "Adding Docker's apt repo..."
             echo \
-                "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-                $(. /etc/os-release && echo \"${UBUNTU_CODENAME:-$VERSION_CODENAME}\") stable" | \
-                sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        
+              "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+              $(. /etc/os-release && echo \"${UBUNTU_CODENAME:-$VERSION_CODENAME}\") stable" | \
+              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
             sudo apt-get update
             sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-            
+
             echo "Adding 'ubuntu' user to docker group..."
             sudo usermod -aG docker ubuntu
-            
+
             echo "Restarting Docker..."
             sudo systemctl restart docker
-        
+
             echo "Deploying Python app container on port 80..."
             docker rm -f python-app || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python-app
             docker run -d --name python-app -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/python-app
-
