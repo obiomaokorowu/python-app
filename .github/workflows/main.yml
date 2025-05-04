@@ -44,7 +44,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            echo "Uninstalling any conflicting Docker packages..."
+            echo "Checking if Docker is installed..."
+          if ! command -v docker &> /dev/null; then
+            echo "Docker not found. Installing Docker..."
             for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
               sudo apt-get remove -y $pkg
             done
@@ -67,11 +69,10 @@ jobs:
 
             echo "Adding 'ubuntu' user to docker group..."
             sudo usermod -aG docker ubuntu
-
-            echo "Restarting Docker..."
-            sudo systemctl restart docker
-
+          else
+            echo "Docker is already installed. Skipping installation."
+          fi
             echo "Deploying Python app container on port 80..."
-            docker rm -f python-app || true
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python-app
-            docker run -d --name python-app -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/python-app
+            sudo docker rm -f python-app || true
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python-app
+            sudo docker run -d --name python-app -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/python-app
