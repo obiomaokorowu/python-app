@@ -4,6 +4,6 @@ WORKDIR /app
 COPY app.py .
 
 RUN pip install flask
-EXPOSE 80
+EXPOSE 8011
 
 CMD ["python", "app.py"]
