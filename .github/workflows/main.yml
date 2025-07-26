@@ -74,7 +74,7 @@ jobs:
               echo "Docker is already installed. Skipping installation."
             fi
 
-            echo "Deploying Python app container on port 8010 ..."
+            echo "Deploying Python app container on port 8011 ..."
             sudo docker rm -f python-april || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python-april
-            sudo docker run -d --name python-april -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/python-april
+            sudo docker run -d --name python-april -p 8011:8011 ${{ secrets.DOCKERHUB_USERNAME }}/python-april
